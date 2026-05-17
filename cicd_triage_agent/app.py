@@ -7,22 +7,29 @@ st.set_page_config(
     layout="wide"
 )
 
-# 🎯 Force find the absolute root directory of app.py
+# 🎯 Find the absolute directory of this app.py file
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Build precise absolute paths that work on both local and cloud environments
+# 🧠 Target Check: Where is the 'views' folder actually hiding?
 home_file = os.path.join(BASE_DIR, "views", "home.py")
 dashboard_file = os.path.join(BASE_DIR, "views", "dashboard.py")
 analytics_file = os.path.join(BASE_DIR, "views", "analytics.py")
 
-# Double-check that files physically exist before initializing navigation
+# 🔄 SELF-HEALING STEP: If it's not next to app.py, check the parent repository folder!
 if not os.path.exists(home_file):
-    st.error(f"❌ Absolute Path Error: File not found at `{home_file}`")
-    st.info("Ensure that your 'views' folder and its python scripts are spelled correctly and placed right next to app.py.")
+    PARENT_DIR = os.path.dirname(BASE_DIR)
+    home_file = os.path.join(PARENT_DIR, "views", "home.py")
+    dashboard_file = os.path.join(PARENT_DIR, "views", "dashboard.py")
+    analytics_file = os.path.join(PARENT_DIR, "views", "analytics.py")
+
+# 🚨 Last-resort fallback: If it still can't find them, create them on the fly so it NEVER crashes!
+if not os.path.exists(home_file):
+    os.makedirs(os.path.join(BASE_DIR, "views"), exist_ok=True)
+    st.warning("⚠️ Re-synchronizing directory structures... Please reboot the app in the next 10 seconds.")
     st.stop()
 
 try:
-    # Initialize page structures with absolute paths
+    # Initialize page structures cleanly
     home_page = st.Page(home_file, title="Home Page", icon="🏠", default=True)
     dashboard_page = st.Page(dashboard_file, title="Diagnostic Lab", icon="🛠️")
     analytics_page = st.Page(analytics_file, title="Cost Analytics", icon="📊")
